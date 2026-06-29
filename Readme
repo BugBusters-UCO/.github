@@ -1,0 +1,186 @@
+# Banking Security Scanner Platform
+
+This project runs one Next.js frontend, one Node.js orchestration backend, and four FastAPI scanner services.
+
+## Services And Ports
+
+| Service | Folder | Port | Health URL |
+| --- | --- | ---: | --- |
+| Frontend | `frontend` | `3000` | `http://127.0.0.1:3000` |
+| Main backend | `main-backend` | `5000` | `http://127.0.0.1:5000/api/health` |
+| Dependency scanner | `dependency-Scanner` | `8001` | `http://127.0.0.1:8001/health` |
+| Config scanner | `config-scanner` | `8002` | `http://127.0.0.1:8002/health` |
+| Secret scanner | `secret-scanner` | `8003` | `http://127.0.0.1:8003/health` |
+| Cipher scanner | `pre-cipher scanner` | `8004` | `http://127.0.0.1:8004/health` |
+
+## Start Everything From Root
+
+Run this from the project root:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2"
+.\start-all.cmd -Restart
+```
+
+This starts all services in the background and writes logs into:
+
+```text
+logs
+```
+
+Open the app at:
+
+```text
+http://127.0.0.1:3000
+```
+
+If you prefer PowerShell directly:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start-all.ps1 -Restart
+```
+
+## Stop Everything From Root
+
+Run:
+
+```powershell
+.\stop-all.cmd
+```
+
+Or:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\stop-all.ps1
+```
+
+This stops services listening on:
+
+```text
+3000, 5000, 8001, 8002, 8003, 8004
+```
+
+## Start A Single Service
+
+Open a terminal in the service folder and run its start script.
+
+Dependency scanner:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\dependency-Scanner"
+.\start.cmd
+```
+
+Config scanner:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\config-scanner"
+.\start.cmd
+```
+
+Secret scanner:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\secret-scanner"
+.\start.cmd
+```
+
+Cipher scanner:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\pre-cipher scanner"
+.\start.cmd
+```
+
+Main backend:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\main-backend"
+.\start.cmd
+```
+
+Frontend:
+
+```powershell
+cd "C:\Users\hp\OneDrive\Desktop\open_source\uco-hakethon-s2\frontend"
+cmd /c node_modules\.bin\next.cmd dev --webpack -H 127.0.0.1
+```
+
+## Stop A Single Service
+
+Stop by port.
+
+Frontend:
+
+```powershell
+Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Main backend:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Dependency scanner:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8001 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Config scanner:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8002 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Secret scanner:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8003 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Cipher scanner:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8004 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+## Logs
+
+When using `start-all`, logs are written here:
+
+```text
+logs\dependency-scanner.out.log
+logs\dependency-scanner.err.log
+logs\config-scanner.out.log
+logs\config-scanner.err.log
+logs\secret-scanner.out.log
+logs\secret-scanner.err.log
+logs\cipher-scanner.out.log
+logs\cipher-scanner.err.log
+logs\main-backend.out.log
+logs\main-backend.err.log
+logs\frontend.out.log
+logs\frontend.err.log
+```
+
+## Common Fixes
+
+If `/api/cipher-scans` returns `404`, restart the main backend:
+
+```powershell
+.\start-all.cmd -Restart
+```
+
+If a scan fails with `ECONNREFUSED 127.0.0.1:8001`, `8002`, `8003`, or `8004`, that scanner service is not running. Start everything again:
+
+```powershell
+.\start-all.cmd -Restart
+```
